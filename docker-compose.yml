@@ -1,0 +1,29 @@
+version: '2.1'
+
+services:
+    localstack:
+        image: localstack/localstack
+        container_name: localstack
+        ports:
+        - "4566:4566"
+        - "4571:4571"
+        environment:
+        - SERVICES=s3,dynamodb,ec2
+        - DOCKER_HOST=unix:///var/run/docker.sock
+        volumes:
+        - "./localstack:/tmp/localstack"
+    
+    dev:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: devbox
+        environment:
+            - TZ=America/New_York
+            - DEBIAN_FRONTEND=noninteractive
+        entrypoint: sleep
+        command:  infinity
+        volumes: 
+            - ./cloudgoat:/app
+        links:
+            - "localstack:localstack"
